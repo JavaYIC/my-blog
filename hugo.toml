@@ -69,18 +69,21 @@ defaultContentLanguage = "zh-cn"
   # 对于 Twitter/X，主题需要简单格式，我们把它放在最前面
   twitter = "yuzurucy"
 RSS = false
-  
+  [params.social.douyin]
+    weight = 90
+    id = "你的抖音号ID"
+    title = "抖音"
   [params.social.bilibili]
     weight = 20
     id = "6216440"
     title = "Bilibili"
   [params.social.youtubechannel]
     weight = 30
-    id = "你的YouTube频道ID"
+    id = "chorbs7"
     title = "YouTube"
   [params.social.weibo]
     weight = 40
-    id = "你的微博ID"
+    id = "6601701460"
     title = "微博"
   [params.social.instagram]
     weight = 60
@@ -94,10 +97,7 @@ RSS = false
     weight = 80
     id = "@你的TikTok用户名"
     title = "TikTok"
-  [params.social.douyin]
-    weight = 90
-    id = "你的抖音号ID"
-    title = "抖音"
+  
     
     # 我们没有在这里包含 Threads 和 小红书，因为它们需要自定义图标，会更复杂一些。
     # RSS = true 这一行已被删除.
