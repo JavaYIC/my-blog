@@ -2,7 +2,7 @@
 
 # 1. 基础配置
 baseURL = "https://chorbs7.com/"
-title = "chorbs次元扭曲地"
+title = "99.1% pure"
 theme = "FixIt"
 languageCode = "zh-cn"
 defaultContentLanguage = "zh-cn"
@@ -101,3 +101,42 @@ RSS = false
     
     # 我们没有在这里包含 Threads 和 小红书，因为它们需要自定义图标，会更复杂一些。
     # RSS = true 这一行已被删除.
+
+  # --- 把下面这个区块，完整地粘贴到 hugo.toml 文件末尾 ---
+
+# 网站主菜单配置
+[[menu.main]]
+  # 菜单项的唯一标识符
+  identifier = "posts"
+  # 菜单上显示的文字
+  name = "文章"
+  # 菜单链接的地址
+  url = "/posts/"
+  # 权重，数字越小越靠前
+  weight = 10
+
+[[menu.main]]
+  identifier = "archives"
+  name = "归档"
+  url = "/archives/"
+  weight = 20
+
+[[menu.main]]
+  identifier = "tags"
+  name = "标签"
+  url = "/tags/"
+  weight = 30
+
+[[menu.main]]
+  identifier = "categories"
+  name = "分类"
+  url = "/categories/"
+  weight = 40
+
+[[menu.main]]
+  identifier = "about"
+  name = "关于"
+  url = "/about/"
+  weight = 50
+  # 你需要自己创建一个 about 页面，方法是运行：
+  # hugo new content about.md
