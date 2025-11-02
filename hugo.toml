@@ -87,11 +87,11 @@ RSS = false
     title = "微博"
   [params.social.instagram]
     weight = 60
-    id = "你的Instagram用户名"
+    id = "chorbs7"
     title = "Instagram"
   [params.social.facebook]
     weight = 70
-    id = "你的Facebook主页ID"
+    id = "cy.chorbs"
     title = "Facebook"
   [params.social.tiktok]
     weight = 80
