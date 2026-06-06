@@ -3,7 +3,6 @@ title: "一篇带图片的文章"
 date: 2025-08-14T10:00:00+08:00
 draft: false
 featuredImage: "cover.png"
-date: 2025-08-13T10:00:00+08:00
 ---
 
 这是文章的开头部分。
