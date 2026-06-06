@@ -19,6 +19,7 @@ $StagingAttachmentsDir = Join-Path $StagingDir "attachments"
 $PromptPath = Join-Path $PSScriptRoot "prompts\publish-obsidian-post.md"
 $ResultPath = Join-Path $StagingDir "result.json"
 $FinalMessagePath = Join-Path $StagingDir "codex-final.md"
+$CodexOutputPath = Join-Path $StagingDir "codex-output.log"
 
 function Write-Step {
   param([string]$Message)
@@ -210,9 +211,9 @@ try {
   Write-Step "Running Codex conversion..."
   Push-Location $BlogRoot
   try {
-    "" | & $CodexExe exec --cd $BlogRoot --sandbox workspace-write --output-last-message $FinalMessagePath $prompt
+    "" | & $CodexExe exec --cd $BlogRoot --sandbox workspace-write --output-last-message $FinalMessagePath $prompt *> $CodexOutputPath
     if ($LASTEXITCODE -ne 0) {
-      throw "Codex conversion failed."
+      throw "Codex conversion failed. See: $CodexOutputPath"
     }
   }
   finally {
