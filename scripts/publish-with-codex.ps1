@@ -20,10 +20,19 @@ $PromptPath = Join-Path $PSScriptRoot "prompts\publish-obsidian-post.md"
 $ResultPath = Join-Path $StagingDir "result.json"
 $FinalMessagePath = Join-Path $StagingDir "codex-final.md"
 $CodexOutputPath = Join-Path $StagingDir "codex-output.log"
+$HugoOutputPath = Join-Path $StagingDir "hugo-output.log"
+$GitOutputPath = Join-Path $StagingDir "git-output.log"
+$StepLogPath = $null
 
 function Write-Step {
   param([string]$Message)
-  Write-Host "[$(Get-Date -Format 'HH:mm:ss')] $Message"
+  $line = "[$(Get-Date -Format 'HH:mm:ss')] $Message"
+  if ($script:StepLogPath) {
+    Add-Content -LiteralPath $script:StepLogPath -Value $line -Encoding UTF8
+  }
+  else {
+    Write-Host $line
+  }
 }
 
 function Resolve-ExistingPath {
@@ -111,13 +120,16 @@ function Copy-ReferencedImages {
 }
 
 function Invoke-HugoBuild {
-  param([string]$HugoExe)
+  param(
+    [string]$HugoExe,
+    [string]$OutputPath
+  )
 
   Push-Location $BlogRoot
   try {
-    & $HugoExe --printI18nWarnings --printPathWarnings
+    & $HugoExe --printI18nWarnings --printPathWarnings *> $OutputPath
     if ($LASTEXITCODE -ne 0) {
-      throw "Hugo build failed."
+      throw "Hugo build failed. See: $OutputPath"
     }
   }
   finally {
@@ -154,6 +166,7 @@ function Play-DoneSound {
 
 New-Item -ItemType Directory -Force -Path $LogDir, $StagingDir, $StagingAttachmentsDir | Out-Null
 $LogPath = Join-Path $LogDir ("publish-{0}.log" -f (Get-Date -Format "yyyyMMdd-HHmmss"))
+$StepLogPath = Join-Path $LogDir ("publish-{0}-steps.log" -f (Get-Date -Format "yyyyMMdd-HHmmss"))
 Start-Transcript -Path $LogPath -Force | Out-Null
 
 try {
@@ -210,6 +223,7 @@ try {
 
   Write-Step "Running Codex conversion..."
   Push-Location $BlogRoot
+  $previousErrorActionPreference = $null
   try {
     $previousErrorActionPreference = $ErrorActionPreference
     $ErrorActionPreference = "Continue"
@@ -240,10 +254,10 @@ try {
   Copy-StagedImagesToPost -Result $result -CopiedImages $copiedImages
 
   Write-Step "Running Hugo build..."
-  Invoke-HugoBuild -HugoExe $HugoExe
+  Invoke-HugoBuild -HugoExe $HugoExe -OutputPath $HugoOutputPath
 
   if ($DryRun) {
-    Write-Step "Dry run complete. No commit or push was performed."
+    Write-Host "Dry run complete: $($result.title)"
     Play-DoneSound
     exit 0
   }
@@ -251,21 +265,21 @@ try {
   Write-Step "Committing and pushing..."
   Push-Location $BlogRoot
   try {
-    git add -- content/posts
+    git add -- content/posts *> $GitOutputPath
     $gitStatus = git status --porcelain
     if (-not $gitStatus) {
       throw "No publish changes were created."
     }
 
     $title = if ($result.title) { [string]$result.title } else { "Obsidian post" }
-    git commit -m "Publish post: $title"
+    git commit -m "Publish post: $title" *>> $GitOutputPath
     if ($LASTEXITCODE -ne 0) {
-      throw "Git commit failed."
+      throw "Git commit failed. See: $GitOutputPath"
     }
 
-    git push origin main
+    git push origin main *>> $GitOutputPath
     if ($LASTEXITCODE -ne 0) {
-      throw "Git push failed."
+      throw "Git push failed. See: $GitOutputPath"
     }
   }
   finally {
@@ -274,6 +288,7 @@ try {
 
   Write-Step "Published successfully: $($result.title)"
   Write-Step "Log: $LogPath"
+  Write-Host "发布成功：$($result.title)"
   Play-DoneSound
 }
 catch {
