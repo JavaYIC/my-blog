@@ -4,7 +4,9 @@ param(
 
   [string]$VaultPath = "",
 
-  [switch]$DryRun
+  [switch]$DryRun,
+
+  [switch]$AllowCodexProcessing
 )
 
 $ErrorActionPreference = "Stop"
@@ -145,6 +147,10 @@ try {
 
   if (-not $ResolvedNotePath.StartsWith($ResolvedVaultPath, [System.StringComparison]::OrdinalIgnoreCase)) {
     throw "The note is not inside the configured Obsidian vault: $ResolvedVaultPath"
+  }
+
+  if (-not $AllowCodexProcessing) {
+    throw "Refusing to send note content to Codex. Re-run with -AllowCodexProcessing when this command is bound to an explicit publish button."
   }
 
   Assert-CleanGit
