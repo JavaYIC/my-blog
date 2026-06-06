@@ -210,7 +210,7 @@ try {
   Write-Step "Running Codex conversion..."
   Push-Location $BlogRoot
   try {
-    & $CodexExe exec --cd $BlogRoot --sandbox workspace-write --output-last-message $FinalMessagePath $prompt
+    "" | & $CodexExe exec --cd $BlogRoot --sandbox workspace-write --output-last-message $FinalMessagePath $prompt
     if ($LASTEXITCODE -ne 0) {
       throw "Codex conversion failed."
     }
