@@ -126,13 +126,21 @@ function Invoke-HugoBuild {
   )
 
   Push-Location $BlogRoot
+  $previousErrorActionPreference = $null
   try {
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
     & $HugoExe --printI18nWarnings --printPathWarnings *> $OutputPath
-    if ($LASTEXITCODE -ne 0) {
+    $hugoExitCode = $LASTEXITCODE
+    $ErrorActionPreference = $previousErrorActionPreference
+    if ($hugoExitCode -ne 0) {
       throw "Hugo build failed. See: $OutputPath"
     }
   }
   finally {
+    if ($previousErrorActionPreference) {
+      $ErrorActionPreference = $previousErrorActionPreference
+    }
     Pop-Location
   }
 }
@@ -153,6 +161,25 @@ function Copy-StagedImagesToPost {
     $target = Join-Path $postDir (Split-Path -Leaf ([string]$image))
     Copy-Item -LiteralPath ([string]$image) -Destination $target -Force
   }
+}
+
+function Get-PublishedPostTitle {
+  param([object]$Result)
+
+  $postPath = Join-Path $BlogRoot ([string]$Result.postPath)
+  if (Test-Path -LiteralPath $postPath -PathType Leaf) {
+    $postMarkdown = Get-Content -LiteralPath $postPath -Raw -Encoding UTF8
+    $match = [regex]::Match($postMarkdown, '(?m)^title:\s*"?([^"\r\n]+)"?\s*$')
+    if ($match.Success) {
+      return $match.Groups[1].Value.Trim()
+    }
+  }
+
+  if ($Result.title) {
+    return [string]$Result.title
+  }
+
+  return "Obsidian post"
 }
 
 function Play-DoneSound {
@@ -249,6 +276,7 @@ try {
   if ($result.status -ne "ready") {
     throw "Codex blocked publishing: $($result.reason)"
   }
+  $publishedTitle = Get-PublishedPostTitle -Result $result
 
   Write-Step "Copying images into post bundle..."
   Copy-StagedImagesToPost -Result $result -CopiedImages $copiedImages
@@ -257,38 +285,46 @@ try {
   Invoke-HugoBuild -HugoExe $HugoExe -OutputPath $HugoOutputPath
 
   if ($DryRun) {
-    Write-Host "Dry run complete: $($result.title)"
+    Write-Host "Dry run complete: $publishedTitle"
     Play-DoneSound
     exit 0
   }
 
   Write-Step "Committing and pushing..."
   Push-Location $BlogRoot
+  $previousErrorActionPreference = $null
   try {
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
     git add -- content/posts *> $GitOutputPath
     $gitStatus = git status --porcelain
     if (-not $gitStatus) {
       throw "No publish changes were created."
     }
 
-    $title = if ($result.title) { [string]$result.title } else { "Obsidian post" }
-    git commit -m "Publish post: $title" *>> $GitOutputPath
-    if ($LASTEXITCODE -ne 0) {
+    git commit -m "Publish post: $publishedTitle" *>> $GitOutputPath
+    $commitExitCode = $LASTEXITCODE
+    if ($commitExitCode -ne 0) {
       throw "Git commit failed. See: $GitOutputPath"
     }
 
     git push origin main *>> $GitOutputPath
-    if ($LASTEXITCODE -ne 0) {
+    $pushExitCode = $LASTEXITCODE
+    $ErrorActionPreference = $previousErrorActionPreference
+    if ($pushExitCode -ne 0) {
       throw "Git push failed. See: $GitOutputPath"
     }
   }
   finally {
+    if ($previousErrorActionPreference) {
+      $ErrorActionPreference = $previousErrorActionPreference
+    }
     Pop-Location
   }
 
-  Write-Step "Published successfully: $($result.title)"
+  Write-Step "Published successfully: $publishedTitle"
   Write-Step "Log: $LogPath"
-  Write-Host "发布成功：$($result.title)"
+  Write-Host "发布成功：$publishedTitle"
   Play-DoneSound
 }
 catch {
