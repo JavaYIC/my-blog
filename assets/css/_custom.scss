@@ -88,6 +88,28 @@
   .links {
     margin-top: .35rem;
   }
+
+  .single.summary > .content {
+    position: relative;
+    max-height: calc(1.75em * 5);
+    overflow: hidden;
+    line-height: 1.75;
+  }
+
+  .single.summary > .content::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 2.25em;
+    pointer-events: none;
+    background: linear-gradient(transparent, var(--fi-background-color, #fff));
+  }
+
+  .single.summary > .content :is(img, figure) {
+    display: none;
+  }
 }
 
 [data-theme='dark'] .home.posts {
@@ -110,6 +132,10 @@
     box-shadow:
       0 18px 48px rgba(0, 0, 0, .32),
       0 0 0 .28rem rgba(10, 18, 32, .85);
+  }
+
+  .single.summary > .content::after {
+    background: linear-gradient(transparent, var(--fi-background-color, #161b22));
   }
 }
 
