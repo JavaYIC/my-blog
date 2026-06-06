@@ -2,7 +2,7 @@ param(
   [Parameter(Mandatory = $true)]
   [string]$NotePath,
 
-  [string]$VaultPath = "D:\文档\Obsidian\Chorbs蔡予昇",
+  [string]$VaultPath = "",
 
   [switch]$DryRun
 )
@@ -138,6 +138,9 @@ Start-Transcript -Path $LogPath -Force | Out-Null
 try {
   Write-Step "Preparing publish job..."
   $ResolvedNotePath = Resolve-ExistingPath $NotePath
+  if (-not $VaultPath) {
+    throw "VaultPath is required. Pass -VaultPath from Obsidian or set it in the Shell Commands configuration."
+  }
   $ResolvedVaultPath = Resolve-ExistingPath $VaultPath
 
   if (-not $ResolvedNotePath.StartsWith($ResolvedVaultPath, [System.StringComparison]::OrdinalIgnoreCase)) {
@@ -162,23 +165,23 @@ try {
   $dryRunText = if ($DryRun) { "Dry run is enabled. Create files for inspection, but the wrapper will not commit or push." } else { "Dry run is disabled. Prepare the post for publishing." }
   $imageList = if ($copiedImages.Count -gt 0) { ($copiedImages -join "`n") } else { "(no images copied)" }
 
-  $prompt = @"
-$promptTemplate
-
-Publish job inputs:
-
-- Blog root: $BlogRoot
-- Staged note: $stagedNote
-- Staged attachments directory: $StagingAttachmentsDir
-- Original Obsidian note path: $ResolvedNotePath
-- Obsidian vault path: $ResolvedVaultPath
-- Publish date: $publishDate
-- Mode: $dryRunText
-
-Copied attachment files:
-
-$imageList
-"@
+  $prompt = @(
+    $promptTemplate,
+    "",
+    "Publish job inputs:",
+    "",
+    "- Blog root: $BlogRoot",
+    "- Staged note: $stagedNote",
+    "- Staged attachments directory: $StagingAttachmentsDir",
+    "- Original Obsidian note path: $ResolvedNotePath",
+    "- Obsidian vault path: $ResolvedVaultPath",
+    "- Publish date: $publishDate",
+    "- Mode: $dryRunText",
+    "",
+    "Copied attachment files:",
+    "",
+    $imageList
+  ) -join "`n"
 
   Write-Step "Running Codex conversion..."
   Push-Location $BlogRoot
