@@ -179,7 +179,7 @@ try {
   $markdown = Get-Content -LiteralPath $ResolvedNotePath -Raw -Encoding UTF8
   $stagedNote = Join-Path $StagingDir "source.md"
   Set-Content -LiteralPath $stagedNote -Value $markdown -Encoding UTF8
-  $copiedImages = Copy-ReferencedImages -Markdown $markdown -ResolvedVaultPath $ResolvedVaultPath -ResolvedNotePath $ResolvedNotePath
+  $copiedImages = @(Copy-ReferencedImages -Markdown $markdown -ResolvedVaultPath $ResolvedVaultPath -ResolvedNotePath $ResolvedNotePath)
 
   $CodexExe = Find-Tool -Name "codex" -FallbackPattern "$env:LOCALAPPDATA\Microsoft\WindowsApps"
   $HugoExe = Find-Tool -Name "hugo" -FallbackPattern "$env:LOCALAPPDATA\Microsoft\WinGet\Packages\Hugo.Hugo.Extended_Microsoft.Winget.Source_8wekyb3d8bbwe"
