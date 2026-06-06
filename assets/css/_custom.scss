@@ -1,0 +1,126 @@
+// ==============================
+// Custom style
+// ==============================
+
+.home.posts {
+  .home-profile {
+    position: relative;
+    isolation: isolate;
+    max-width: 42rem;
+    margin: 1.25rem auto 2.75rem;
+    padding: 3rem 1.25rem 2.25rem;
+    overflow: hidden;
+  }
+
+  .home-profile::before,
+  .home-profile::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .home-profile::before {
+    opacity: .55;
+    background:
+      linear-gradient(rgba(39, 128, 227, .08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(39, 128, 227, .08) 1px, transparent 1px);
+    background-size: 28px 28px;
+    mask-image: radial-gradient(circle at center, #000 0, transparent 72%);
+  }
+
+  .home-profile::after {
+    background:
+      radial-gradient(circle at 50% 22%, rgba(71, 161, 255, .18), transparent 32%),
+      radial-gradient(circle at 50% 46%, rgba(114, 255, 225, .12), transparent 28%);
+  }
+
+  .home-avatar {
+    position: relative;
+    display: inline-flex;
+    padding: .55rem;
+  }
+
+  .home-avatar::before {
+    content: "";
+    position: absolute;
+    inset: -.2rem;
+    border-radius: 50%;
+    background: conic-gradient(
+      from 0deg,
+      rgba(64, 175, 255, .15),
+      rgba(116, 255, 225, .95),
+      rgba(124, 92, 255, .8),
+      rgba(64, 175, 255, .15)
+    );
+    filter: blur(.35px);
+    animation: home-avatar-ring 8s linear infinite;
+  }
+
+  .home-avatar::after {
+    content: "";
+    position: absolute;
+    inset: .25rem;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, .72);
+    box-shadow: 0 0 24px rgba(71, 161, 255, .28);
+  }
+
+  .home-avatar a,
+  .home-avatar img {
+    position: relative;
+    z-index: 1;
+  }
+
+  .home-avatar img {
+    width: 7.25rem;
+    box-shadow:
+      0 18px 45px rgba(20, 78, 128, .18),
+      0 0 0 .28rem rgba(255, 255, 255, .85);
+  }
+
+  .home-subtitle {
+    margin-top: .25rem;
+    color: var(--fi-global-font-secondary-color);
+  }
+
+  .links {
+    margin-top: .35rem;
+  }
+}
+
+[data-theme='dark'] .home.posts {
+  .home-profile::before {
+    opacity: .72;
+  }
+
+  .home-profile::after {
+    background:
+      radial-gradient(circle at 50% 22%, rgba(71, 161, 255, .22), transparent 34%),
+      radial-gradient(circle at 50% 48%, rgba(114, 255, 225, .14), transparent 30%);
+  }
+
+  .home-avatar::after {
+    border-color: rgba(255, 255, 255, .24);
+    box-shadow: 0 0 28px rgba(71, 161, 255, .36);
+  }
+
+  .home-avatar img {
+    box-shadow:
+      0 18px 48px rgba(0, 0, 0, .32),
+      0 0 0 .28rem rgba(10, 18, 32, .85);
+  }
+}
+
+@keyframes home-avatar-ring {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home.posts .home-avatar::before {
+    animation: none;
+  }
+}
