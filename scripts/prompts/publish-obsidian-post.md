@@ -23,7 +23,8 @@ Front matter expectations:
 - `author.name`: use `chorbs` when not specified.
 - `tags` and `categories`: preserve meaningful values when present; otherwise infer 1-3 useful Chinese values from the article.
 - `summary`: write a concise Chinese summary if the note does not already provide one.
-- `featuredImage`: if the article has images, use the first image filename as the featured image.
+- `featuredImagePreview`: if the article has images, use the first image filename as the home/list preview image.
+- Do not set `featuredImage` unless explicitly requested. FixIt renders `featuredImage` at the top of the post page, which changes the author's image placement.
 
 Image handling:
 

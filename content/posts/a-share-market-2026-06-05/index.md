@@ -11,7 +11,7 @@ tags:
 categories:
   - "投资"
 summary: "围绕 2026 年 6 月 5 日 A 股行情，分析大盘、AI 链、机器人、SpaceX 上市概念以及整体仓位策略。"
-featuredImage: "131c9fab9ffe593b7f103b7b6271f448_MD5.jpg"
+featuredImagePreview: "131c9fab9ffe593b7f103b7b6271f448_MD5.jpg"
 draft: false
 ---
 
