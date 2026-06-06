@@ -211,12 +211,19 @@ try {
   Write-Step "Running Codex conversion..."
   Push-Location $BlogRoot
   try {
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
     "" | & $CodexExe exec --cd $BlogRoot --sandbox workspace-write --output-last-message $FinalMessagePath $prompt *> $CodexOutputPath
-    if ($LASTEXITCODE -ne 0) {
+    $codexExitCode = $LASTEXITCODE
+    $ErrorActionPreference = $previousErrorActionPreference
+    if ($codexExitCode -ne 0) {
       throw "Codex conversion failed. See: $CodexOutputPath"
     }
   }
   finally {
+    if ($previousErrorActionPreference) {
+      $ErrorActionPreference = $previousErrorActionPreference
+    }
     Pop-Location
   }
 
