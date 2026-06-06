@@ -6,8 +6,8 @@ Follow these rules exactly:
 
 1. Do not modify the original Obsidian vault.
 2. Do not modify files under `.publish-staging` except when explicitly writing metadata.
-3. Create or update exactly one Hugo post under `content/posts/<slug>/index.md`.
-4. Copy every referenced image from `.publish-staging/attachments` into the post bundle directory.
+3. Create or update exactly one Hugo post Markdown file under `content/posts/<slug>/index.md`.
+4. Do not create, copy, overwrite, or edit image files. The wrapper script copies binary images after you finish.
 5. Convert Obsidian image embeds such as `![[image.jpg]]` or `![[image.jpg|caption]]` into Hugo-compatible Markdown image links.
 6. Use YAML front matter.
 7. Set `draft: false`.
@@ -25,6 +25,13 @@ Front matter expectations:
 - `summary`: write a concise Chinese summary if the note does not already provide one.
 - `featuredImage`: if the article has images, use the first image filename as the featured image.
 
+Image handling:
+
+- The available images are listed in the publish job input.
+- Use only the image filenames in Markdown links, for example `![caption](image.jpg)`.
+- Do not try to copy images from `.publish-staging/attachments`.
+- Do not block the job because image files are not already present in the post bundle; the wrapper script will copy them.
+
 After creating the post, write `.publish-staging/result.json` with this shape:
 
 ```json
@@ -32,6 +39,7 @@ After creating the post, write `.publish-staging/result.json` with this shape:
   "title": "文章标题",
   "slug": "post-slug",
   "postPath": "content/posts/post-slug/index.md",
+  "images": ["image.jpg"],
   "status": "ready"
 }
 ```

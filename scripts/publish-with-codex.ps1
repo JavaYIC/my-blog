@@ -124,6 +124,24 @@ function Invoke-HugoBuild {
   }
 }
 
+function Copy-StagedImagesToPost {
+  param(
+    [object]$Result,
+    [object[]]$CopiedImages
+  )
+
+  $postPath = Join-Path $BlogRoot ([string]$Result.postPath)
+  if (-not (Test-Path -LiteralPath $postPath -PathType Leaf)) {
+    throw "Published post file was not created: $postPath"
+  }
+
+  $postDir = Split-Path -Parent $postPath
+  foreach ($image in $CopiedImages) {
+    $target = Join-Path $postDir (Split-Path -Leaf ([string]$image))
+    Copy-Item -LiteralPath ([string]$image) -Destination $target -Force
+  }
+}
+
 function Play-DoneSound {
   try {
     [System.Media.SystemSounds]::Asterisk.Play()
@@ -209,6 +227,9 @@ try {
   if ($result.status -ne "ready") {
     throw "Codex blocked publishing: $($result.reason)"
   }
+
+  Write-Step "Copying images into post bundle..."
+  Copy-StagedImagesToPost -Result $result -CopiedImages $copiedImages
 
   Write-Step "Running Hugo build..."
   Invoke-HugoBuild -HugoExe $HugoExe
